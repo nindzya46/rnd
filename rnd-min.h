@@ -12,13 +12,25 @@ struct rnd {
 	__inline static uint64_t next_t() {
 		const uint64_t c = __rdtsc();
 
-		uint64_t t0 = (c * c + RND_POLYNOM) * c;
+		uint64_t t0 = (c * c * c + RND_POLYNOM) * c; // Mb enough (c * c + RND_POLYNOM) * c
 		uint64_t t1 = t0;
 
 		t0 ^= _rotl64(((t0 & (1ULL << (-1 + RND_A))) == 0 ? ((t0 >> 1) ^ RND_POLYNOM) : (t0 >> 1)) + t0, RND_B);
 		t1 ^= _rotr64(((t1 & (1ULL << (-1 + RND_C))) != 0 ? ((t1 << 1) ^ RND_POLYNOM) : (t1 << 1)) + t0, RND_D);
 		//t1 ^= _rotl64(((t1 & (1ULL << (-1 + RND_A))) == 0 ? ((t1 >> 1) ^ RND_POLYNOM) : (t1 >> 1)) + t0, RND_B);
 		//t0 ^= _rotr64(((t0 & (1ULL << (-1 + RND_C))) != 0 ? ((t0 << 1) ^ RND_POLYNOM) : (t0 << 1)) + t1, RND_D);
+
+		return t0 + t1;
+	}
+
+	__inline static uint64_t shuffle(const uint64_t n) {
+		uint64_t t0 = (n * n * n + RND_POLYNOM) * n;
+		uint64_t t1 = t0;
+
+		t0 ^= _rotl64(((t0 & (1ULL << (-1 + RND_A))) == 0 ? ((t0 >> 1) ^ RND_POLYNOM) : (t0 >> 1)) + t0, RND_B);
+		t1 ^= _rotr64(((t1 & (1ULL << (-1 + RND_C))) != 0 ? ((t1 << 1) ^ RND_POLYNOM) : (t1 << 1)) + t0, RND_D);
+		t1 ^= _rotl64(((t1 & (1ULL << (-1 + RND_A))) == 0 ? ((t1 >> 1) ^ RND_POLYNOM) : (t1 >> 1)) + t0, RND_B);
+		t0 ^= _rotr64(((t0 & (1ULL << (-1 + RND_C))) != 0 ? ((t0 << 1) ^ RND_POLYNOM) : (t0 << 1)) + t1, RND_D);
 
 		return t0 + t1;
 	}
@@ -48,5 +60,4 @@ struct rnd {
 		return (next_t() >> i) & 1 ? 1 : -1;
 	}
 
-//#undef RND_POLYNOM
 };
