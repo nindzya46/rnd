@@ -12,8 +12,7 @@ struct rnd {
 	__inline static uint64_t next_t() {
 		const uint64_t c = __rdtsc();
 
-		//uint64_t t0 = (((c * RND_POLYNOM) ^ RND_POLYNOM) * RND_POLYNOM) ^ RND_POLYNOM; t0 ^= _rotl(t0, 1);
-		uint64_t t0 = (c ^ RND_POLYNOM) * RND_POLYNOM; t0 ^= _rotl(t0, 1);
+		uint64_t t0 = (((c * RND_POLYNOM) ^ RND_POLYNOM) * RND_POLYNOM) ^ RND_POLYNOM; t0 ^= _rotl(t0, 1);
 		uint64_t t1 = t0;
 
 		t0 ^= _rotl64(((t0 & (1ULL << (-1 + RND_A))) == 0 ? ((t0 >> 1) ^ RND_POLYNOM) : (t0 >> 1)) + t0, RND_B);
@@ -25,7 +24,7 @@ struct rnd {
 	}
 
 	__inline static uint64_t shuffle(const uint64_t n) {
-		uint64_t t0 = (n ^ RND_POLYNOM) * RND_POLYNOM; t0 ^= _rotl(t0, 1);
+		uint64_t t0 = (((n * RND_POLYNOM) ^ RND_POLYNOM) * RND_POLYNOM) ^ RND_POLYNOM; t0 ^= _rotl(t0, 1);
 		uint64_t t1 = t0;
 
 		t0 ^= _rotl64(((t0 & (1ULL << (-1 + RND_A))) == 0 ? ((t0 >> 1) ^ RND_POLYNOM) : (t0 >> 1)) + t0, RND_B);
